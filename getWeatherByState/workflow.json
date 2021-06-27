@@ -1,0 +1,51 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "actions": {
+            "Return_response_from_Weather_API": {
+                "type": "Response",
+                "kind": "http",
+                "inputs": {
+                    "statusCode": "@outputs('Call_Weather_API')['statusCode']",
+                    "body": "@body('Call_Weather_API')"
+                },
+                "runAfter": {
+                    "Call_Weather_API": [
+                        "Succeeded"
+                    ]
+                }
+            },
+            "Call_Weather_API": {
+                "type": "Http",
+                "inputs": {
+                    "method": "GET",
+                    "uri": "http://api.openweathermap.org/data/2.5/weather",
+                    "queries": {
+                        "q": "@triggerBody()?['city']",
+                        "appid": "@appsetting('weatherapi_accesskey')"
+                    }
+                },
+                "runAfter": {}
+            }
+        },
+        "triggers": {
+            "manual": {
+                "type": "Request",
+                "kind": "Http",
+                "inputs": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "city": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "contentVersion": "1.0.0.0",
+        "outputs": {}
+    },
+    "kind": "Stateful"
+}
